@@ -4,33 +4,44 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
-import static org.openjdk.jmh.annotations.Scope.Thread;
+import static org.openjdk.jmh.annotations.Scope.Benchmark;
 
 /**
  * Test to see how fast is a {@link java.util.EnumMap} compared to a {@link java.util.HashMap}.
- * Results on my mac (2018) i7 2.2 GHz 16 GB:
+ * Results on a mac (2018) i7 2.2 GHz 6 cores 16 GB:
+ <pre>
+ *      Benchmark                            Mode  Cnt   Score   Error  Units
+ *      EnumMapBench.baseLine                avgt    5   0.256 ± 0.006  ns/op
+ *      EnumMapBench.enumMapGet              avgt    5   2.809 ± 0.032  ns/op
+ *      EnumMapBench.hashMapGet              avgt    5   4.337 ± 0.078  ns/op
+ * </pre>
+ * With 3 threads:
  * <pre>
- *     Benchmark                Mode  Cnt  Score   Error  Units
- *     EnumMapBench.baseLine    avgt    5  0.256 ± 0.002  ns/op
- *     EnumMapBench.enumMapGet  avgt    5  2.832 ± 0.068  ns/op
- *     EnumMapBench.hashMapGet  avgt    5  2.821 ± 0.037  ns/op
+ *      Benchmark                            Mode  Cnt   Score   Error  Units
+ *      EnumMapBench.baseLine                avgt    5    0.258 ±  0.001  ns/op
+ *      EnumMapBench.enumMapGet              avgt    5    2.957 ±  0.191  ns/op
+ *      EnumMapBench.hashMapGet              avgt    5    4.668 ±  0.336  ns/op
+ * </pre>
+ * With 6 threads:
+ * <pre>
+ *      Benchmark                Mode  Cnt  Score   Error  Units
+ *      EnumMapBench.baseLine                avgt    5    0.277 ± 0.035  ns/op
+ *      EnumMapBench.enumMapGet              avgt    5    3.641 ± 0.415  ns/op
+ *      EnumMapBench.hashMapGet              avgt    5    5.549 ± 0.131  ns/op
  * </pre>
  */
-@State(Thread)
+@State(Benchmark)
 @BenchmarkMode(AverageTime)
 @OutputTimeUnit(NANOSECONDS)
 @Warmup(iterations = 5, time = 1, timeUnit = SECONDS)
@@ -51,7 +62,7 @@ public class EnumMapBench {
 
     @Benchmark
     public Object hashMapGet() {
-        return enumMap.get(MyEnum.E3);
+        return hashMap.get(MyEnum.E3);
     }
 
     @Setup
